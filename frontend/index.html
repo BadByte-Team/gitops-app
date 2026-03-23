@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Curso GitOps — Login</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 400px;
+    }
+    .logo {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .logo h1 { font-size: 1.6rem; color: #38bdf8; }
+    .logo p { color: #94a3b8; font-size: 0.9rem; margin-top: 0.25rem; }
+    .form-group { margin-bottom: 1.25rem; }
+    label { display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 0.4rem; }
+    input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      color: #e2e8f0;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus { border-color: #38bdf8; }
+    button {
+      width: 100%;
+      padding: 0.85rem;
+      background: #0ea5e9;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover { background: #0284c7; }
+    .error {
+      color: #f87171;
+      font-size: 0.85rem;
+      text-align: center;
+      margin-top: 1rem;
+      display: none;
+    }
+    footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.78rem;
+      color: #475569;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <h1>🚀 Curso GitOps</h1>
+      <p>Accede a tu cuenta</p>
+    </div>
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="username">Usuario</label>
+        <input type="text" id="username" placeholder="tu usuario" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <input type="password" id="password" placeholder="••••••••" required>
+      </div>
+      <button type="submit" id="loginBtn">Iniciar sesión</button>
+      <p class="error" id="errorMsg">Credenciales inválidas. Intenta de nuevo.</p>
+    </form>
+    <footer>GitOps &copy; 2026</footer>
+  </div>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('loginBtn');
+      const error = document.getElementById('errorMsg');
+      btn.textContent = 'Entrando...';
+      btn.disabled = true;
+      error.style.display = 'none';
+
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: document.getElementById('username').value,
+            password: document.getElementById('password').value
+          })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          localStorage.setItem('token', data.data.token);
+          localStorage.setItem('role', data.data.role);
+          window.location.href = data.data.role === 'admin' ? '/admin.html' : '/dashboard.html';
+        } else {
+          throw new Error(data.message);
+        }
+      } catch {
+        error.style.display = 'block';
+      } finally {
+        btn.textContent = 'Iniciar sesión';
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

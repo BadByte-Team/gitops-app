@@ -1,0 +1,29 @@
+# ── Go binaries ──
+curso-gitops
+*.exe
+
+# ── Docker ──
+*.log
+docker-compose.override.yml
+
+# ── IDE ──
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# ── OS ──
+.DS_Store
+Thumbs.db
+
+# ── Secrets ──
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ── Temporary ──
+tmp/
+temp/
+vendor/
