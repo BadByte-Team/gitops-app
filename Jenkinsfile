@@ -8,9 +8,9 @@ pipeline {
 
     environment {
         DOCKER_HUB_CREDS = credentials('dockerhub-id')
-        DOCKER_IMAGE     = "gjisus/curso-gitops"
+        DOCKER_IMAGE     = "TU_USUARIO_DOCKERHUB/curso-gitops"
         SCANNER_HOME     = tool('sonar-scanner')
-        GITHUB_USER      = "GutsNet"
+        GITHUB_USER      = "TU_USUARIO_GITHUB"
         INFRA_REPO       = "gitops-infra"
     }
 
