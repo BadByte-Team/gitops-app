@@ -95,8 +95,7 @@ pipeline {
                         git config user.name "Jenkins CI"
 
                         # Actualizar el tag de la imagen en deployment.yaml
-                        sed -i "s|image: ${DOCKER_IMAGE}:.*|image: ${DOCKER_IMAGE}:${BUILD_TAG}|" \
-                            infrastructure/kubernetes/app/deployment.yaml
+                        sed -i "s|image: .*/curso-gitops:.*|image: ${DOCKER_IMAGE}:${BUILD_TAG}|" infrastructure/kubernetes/app/deployment.yaml
 
                         git add infrastructure/kubernetes/app/deployment.yaml
                         git commit -m "ci: deploy version ${BUILD_TAG} from Jenkins"
