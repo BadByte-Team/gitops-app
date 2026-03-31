@@ -83,7 +83,7 @@ pipeline {
 
         stage('Deploy to GitOps Repo') {
             steps {
-                withCredentials([string(credentialsId: 'github-token-id', variable: 'GITHUB_TOKEN')]) {
+                withCredentials([usernamePassword(credentialsId: 'github-token-id', usernameVariable: 'GITHUB_USER', passwordVariable: 'GITHUB_TOKEN')]) {
                     sh """
                         rm -rf infra-repo
 
