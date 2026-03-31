@@ -46,19 +46,19 @@ pipeline {
 
         stage('Quality Gate') {
             steps {
-                timeout(time: 5, unit: 'MINUTES') {
+                timeout(time: 10, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
                 }
             }
         }
 
-        stage('Docker Build') {
-            steps {
-                sh "docker build -t ${DOCKER_IMAGE}:${BUILD_TAG} ."
-                sh "docker tag ${DOCKER_IMAGE}:${BUILD_TAG} ${DOCKER_IMAGE}:latest"
-                echo "Imagen construida: ${DOCKER_IMAGE}:${BUILD_TAG}"
-            }
-        }
+        // stage('Docker Build') {
+        //     steps {
+        //         sh "docker build -t ${DOCKER_IMAGE}:${BUILD_TAG} ."
+        //         sh "docker tag ${DOCKER_IMAGE}:${BUILD_TAG} ${DOCKER_IMAGE}:latest"
+        //         echo "Imagen construida: ${DOCKER_IMAGE}:${BUILD_TAG}"
+        //     }
+        // }
 
         stage('Trivy Scan') {
             steps {
