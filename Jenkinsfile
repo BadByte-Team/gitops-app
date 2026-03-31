@@ -12,6 +12,7 @@ pipeline {
         SCANNER_HOME     = tool('sonar-scanner')
         GITHUB_USER      = "GutsNet"
         INFRA_REPO       = "gitops-infra"
+        REPO_OWNER       = "BadByte-Team"
     }
 
     stages {
@@ -87,7 +88,7 @@ pipeline {
                     sh """
                         rm -rf infra-repo
 
-                        git clone https://${GITHUB_TOKEN}@github.com/${GITHUB_USER}/${INFRA_REPO}.git infra-repo
+                        git clone https://${GITHUB_TOKEN}@github.com/${REPO_OWNER}/${INFRA_REPO}.git infra-repo
 
                         cd infra-repo
                         git config user.email "jenkins@local.com"
