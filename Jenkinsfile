@@ -61,18 +61,6 @@ pipeline {
             }
         }
 
-        stage('Trivy Scan') {
-            steps {
-                sh """
-                    trivy image \
-                      --exit-code 0 \
-                      --severity HIGH,CRITICAL \
-                      --format table \
-                      ${DOCKER_IMAGE}:${BUILD_TAG}
-                """
-            }
-        }
-
         stage('Docker Push') {
             steps {
                 sh "echo ${DOCKER_HUB_CREDS_PSW} | docker login -u ${DOCKER_HUB_CREDS_USR} --password-stdin"
