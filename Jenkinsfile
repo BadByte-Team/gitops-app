@@ -72,11 +72,11 @@ pipeline {
 
         stage('Deploy to GitOps Repo') {
             steps {
-                withCredentials([string(credentialsId: 'github-token-id', variable: 'GITHUB_TOKEN')]) {
+                withCredentials([usernamePassword(credentialsId: 'github-token-id', usernameVariable: 'GH_USER', passwordVariable: 'GITHUB_TOKEN')]) {
                     sh """
                         rm -rf infra-repo
 
-                        git clone https://${GITHUB_TOKEN}@github.com/${REPO_ORG}/${INFRA_REPO}.git infra-repo
+                        git clone https://${GH_USER}:${GITHUB_TOKEN}@github.com/${REPO_ORG}/${INFRA_REPO}.git infra-repo
 
                         cd infra-repo
                         git config user.email "jenkins@local.com"
