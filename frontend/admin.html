@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Curso GitOps — Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0b0f19;
+      color: #c9d1d9;
+      min-height: 100vh;
+      display: flex;
+    }
+
+    .sidebar {
+      width: 250px;
+      background: #0d1117;
+      border-right: 1px solid #21262d;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 10;
+    }
+
+    .sidebar-brand {
+      padding: 1.25rem 1rem;
+      border-bottom: 1px solid #21262d;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      background: #8b5cf6;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-icon svg {
+      color: #fff;
+      width: 18px;
+      height: 18px;
+    }
+
+    .brand-text h2 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #e6edf3;
+    }
+
+    .brand-text span {
+      font-size: 0.65rem;
+      color: #484f58;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 0.75rem 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .nav-section {
+      padding: 0.5rem 0.85rem 0.2rem;
+      font-size: 0.6rem;
+      font-weight: 600;
+      color: #484f58;
+      text-transform: uppercase;
+      letter-spacing: 0.05rem;
+      margin-top: 0.5rem;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.6rem 0.85rem;
+      border-radius: 8px;
+      color: #7d8590;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+
+    .nav-item.active {
+      background: #1c2128;
+      color: #e6edf3;
+    }
+
+    .nav-item svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .sidebar-footer {
+      padding: 0.75rem;
+      border-top: 1px solid #21262d;
+    }
+
+    .user-card {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.65rem;
+      border-radius: 8px;
+      background: #161b22;
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      background: #8b5cf6;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .user-avatar svg {
+      color: #fff;
+      width: 16px;
+      height: 16px;
+    }
+
+    .user-info strong {
+      display: block;
+      font-size: 0.78rem;
+      color: #e6edf3;
+    }
+
+    .user-info span {
+      font-size: 0.65rem;
+      color: #484f58;
+    }
+
+    .admin-badge {
+      display: inline-block;
+      background: #8b5cf6;
+      color: #fff;
+      font-size: 0.55rem;
+      font-weight: 700;
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+      text-transform: uppercase;
+    }
+
+    .main {
+      margin-left: 250px;
+      flex: 1;
+      padding: 1.75rem 2rem;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.75rem;
+    }
+
+    .topbar h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #e6edf3;
+    }
+
+    .topbar h1 .admin-badge {
+      font-size: 0.6rem;
+      vertical-align: middle;
+      margin-left: 0.4rem;
+    }
+
+    .btn-logout {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.45rem 0.85rem;
+      background: #1c1214;
+      border: 1px solid #3d1518;
+      border-radius: 6px;
+      color: #f85149;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .btn-logout svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .stat-card {
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-radius: 10px;
+      padding: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .stat-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .stat-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .stat-icon.purple {
+      background: #1c1631;
+      color: #bc8cff;
+    }
+
+    .stat-icon.blue {
+      background: #12253a;
+      color: #58a6ff;
+    }
+
+    .stat-icon.green {
+      background: #12261e;
+      color: #3fb950;
+    }
+
+    .stat-icon.amber {
+      background: #2a1f0e;
+      color: #d29922;
+    }
+
+    .stat-text span {
+      font-size: 0.7rem;
+      color: #484f58;
+    }
+
+    .stat-text strong {
+      display: block;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #e6edf3;
+    }
+
+    .section {
+      margin-bottom: 2rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      margin-bottom: 0.85rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #e6edf3;
+    }
+
+    .section-header svg {
+      width: 18px;
+      height: 18px;
+      color: #bc8cff;
+    }
+
+    .section-header-right {
+      margin-left: auto;
+    }
+
+    .btn-add {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      background: #238636;
+      border: none;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-add svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .table-wrap {
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-size: 0.82rem;
+    }
+
+    th {
+      color: #484f58;
+      font-weight: 600;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03rem;
+      background: #0d1117;
+      border-bottom: 1px solid #21262d;
+    }
+
+    td {
+      color: #c9d1d9;
+      border-bottom: 1px solid #1c2128;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .role-badge,
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+
+    .role-badge.admin {
+      background: #1c1631;
+      color: #bc8cff;
+    }
+
+    .role-badge.student {
+      background: #12261e;
+      color: #3fb950;
+    }
+
+    .status-badge.visible {
+      background: #12261e;
+      color: #3fb950;
+    }
+
+    .status-badge.hidden,
+    .status-badge.blocked {
+      background: #1c1214;
+      color: #f85149;
+    }
+
+    .status-badge.active {
+      background: #12261e;
+      color: #3fb950;
+    }
+
+    .status-badge svg,
+    .role-badge svg {
+      width: 11px;
+      height: 11px;
+    }
+
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.3rem 0.6rem;
+      border-radius: 5px;
+      background: #1c2128;
+      border: 1px solid #30363d;
+      color: #7d8590;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 500;
+      cursor: pointer;
+      margin-right: 0.25rem;
+    }
+
+    .btn-action svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    .btn-action.danger {
+      border-color: #3d1518;
+      color: #f85149;
+      background: #1c1214;
+    }
+
+    .btn-action.success {
+      border-color: #1b4332;
+      color: #3fb950;
+      background: #12261e;
+    }
+
+    .accordion {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .accordion-item {
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .accordion-header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      padding: 0.85rem 1rem;
+      background: none;
+      border: none;
+      color: #c9d1d9;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .accordion-num {
+      width: 30px;
+      height: 30px;
+      background: #8b5cf6;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .accordion-title {
+      flex: 1;
+    }
+
+    .accordion-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .accordion-chevron {
+      width: 16px;
+      height: 16px;
+      color: #484f58;
+      transition: transform 0.2s;
+    }
+
+    .accordion-item.open .accordion-chevron {
+      transform: rotate(180deg);
+    }
+
+    .accordion-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+
+    .accordion-item.open .accordion-body {
+      max-height: 1000px;
+    }
+
+    .accordion-content {
+      padding: 0 1rem 0.85rem;
+      border-top: 1px solid #21262d;
+      padding-top: 0.85rem;
+    }
+
+    .accordion-actions {
+      display: flex;
+      gap: 0.35rem;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.65rem;
+      border-bottom: 1px solid #1c2128;
+    }
+
+    .episode-row {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.5rem 0;
+      font-size: 0.8rem;
+      color: #7d8590;
+      border-bottom: 1px solid #1c2128;
+    }
+
+    .episode-row:last-child {
+      border-bottom: none;
+    }
+
+    .episode-row svg {
+      width: 14px;
+      height: 14px;
+      color: #484f58;
+      flex-shrink: 0;
+    }
+
+    .episode-row .ep-title {
+      flex: 1;
+    }
+
+    .episode-row .ep-actions {
+      display: flex;
+      gap: 0.25rem;
+    }
+
+    .no-episodes {
+      color: #484f58;
+      font-size: 0.78rem;
+      padding: 0.35rem 0;
+    }
+
+    .empty-msg {
+      text-align: center;
+      color: #484f58;
+      font-size: 0.82rem;
+      padding: 1.5rem;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.65);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 1.75rem;
+      width: 100%;
+      max-width: 460px;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .modal-header-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-header-icon.purple {
+      background: #1c1631;
+    }
+
+    .modal-header-icon.purple svg {
+      width: 18px;
+      height: 18px;
+      color: #bc8cff;
+    }
+
+    .modal-header-icon.blue {
+      background: #12253a;
+    }
+
+    .modal-header-icon.blue svg {
+      width: 18px;
+      height: 18px;
+      color: #58a6ff;
+    }
+
+    .modal-header-icon.green {
+      background: #12261e;
+    }
+
+    .modal-header-icon.green svg {
+      width: 18px;
+      height: 18px;
+      color: #3fb950;
+    }
+
+    .modal-header-icon.red {
+      background: #1c1214;
+    }
+
+    .modal-header-icon.red svg {
+      width: 18px;
+      height: 18px;
+      color: #f85149;
+    }
+
+    .modal-header h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #e6edf3;
+    }
+
+    .modal-body {
+      color: #7d8590;
+      font-size: 0.82rem;
+      line-height: 1.6;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: #7d8590;
+      margin-bottom: 0.35rem;
+    }
+
+    .form-group label svg {
+      width: 13px;
+      height: 13px;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      color: #c9d1d9;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: #58a6ff;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.82rem;
+      color: #7d8590;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: auto;
+      accent-color: #8b5cf6;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.55rem 0;
+      border-bottom: 1px solid #21262d;
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-label {
+      color: #484f58;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .detail-label svg {
+      width: 13px;
+      height: 13px;
+    }
+
+    .detail-value {
+      color: #e6edf3;
+      font-weight: 500;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-top: 1.25rem;
+    }
+
+    .btn-modal {
+      padding: 0.5rem 1.1rem;
+      border-radius: 6px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .btn-modal svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .btn-modal.secondary {
+      background: #21262d;
+      color: #7d8590;
+    }
+
+    .btn-modal.primary {
+      background: #1f6feb;
+      color: #fff;
+    }
+
+    .btn-modal.green {
+      background: #238636;
+      color: #fff;
+    }
+
+    .btn-modal.danger {
+      background: #da3633;
+      color: #fff;
+    }
+
+    .modal-msg {
+      font-size: 0.78rem;
+      text-align: center;
+      margin-top: 0.75rem;
+      padding: 0.45rem;
+      border-radius: 5px;
+      display: none;
+    }
+
+    .modal-msg.error {
+      color: #f85149;
+      background: #1c1214;
+      border: 1px solid #3d1518;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+
+      .main {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon"><i data-lucide="shield"></i></div>
+      <div class="brand-text">
+        <h2>Curso GitOps</h2><span>Panel de administración</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">General</div>
+      <button class="nav-item active" onclick="scrollTo('statsSection')"><i data-lucide="layout-dashboard"></i>
+        Dashboard</button>
+      <div class="nav-section">Gestión</div>
+      <button class="nav-item" onclick="scrollTo('usersSection')"><i data-lucide="users"></i> Usuarios</button>
+      <button class="nav-item" onclick="scrollTo('modulesSection')"><i data-lucide="layers"></i> Módulos</button>
+      <div class="nav-section">Sistema</div>
+      <button class="nav-item" onclick="openModal('systemModal')"><i data-lucide="server"></i> Estado del
+        sistema</button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar"><i data-lucide="shield-check"></i></div>
+        <div class="user-info"><strong id="sidebarUser">Admin</strong><span><span
+              class="admin-badge">ADMIN</span></span></div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <h1>Panel de Admin <span class="admin-badge">ADMIN</span></h1>
+      <button class="btn-logout" onclick="logout()"><i data-lucide="log-out"></i> Cerrar sesión</button>
+    </div>
+
+    <div id="statsSection" class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon purple"><i data-lucide="users"></i></div>
+        <div class="stat-text"><span>Usuarios</span><strong id="statUsers">—</strong></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon blue"><i data-lucide="layers"></i></div>
+        <div class="stat-text"><span>Módulos</span><strong id="statModules">—</strong></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green"><i data-lucide="play-circle"></i></div>
+        <div class="stat-text"><span>Episodios</span><strong id="statEpisodes">—</strong></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon amber"><i data-lucide="eye-off"></i></div>
+        <div class="stat-text"><span>Ocultos</span><strong id="statHidden">—</strong></div>
+      </div>
+    </div>
+
+    <div id="usersSection" class="section">
+      <div class="section-header"><i data-lucide="users"></i> Usuarios registrados</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Usuario</th>
+              <th>Rol</th>
+              <th>Estado</th>
+              <th>Registrado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="usersTable">
+            <tr>
+              <td colspan="6" class="empty-msg">Cargando...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="modulesSection" class="section">
+      <div class="section-header">
+        <i data-lucide="layers"></i> Módulos y Episodios
+        <div class="section-header-right"><button class="btn-add" onclick="openCreateModuleModal()"><i
+              data-lucide="plus"></i> Nuevo módulo</button></div>
+      </div>
+      <div class="accordion" id="modulesAccordion">
+        <p class="empty-msg">Cargando...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Module Modal -->
+  <div class="modal-overlay" id="moduleModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-header-icon purple"><i data-lucide="layers"></i></div>
+        <h3 id="moduleModalTitle">Nuevo módulo</h3>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="moduleEditId">
+        <div class="form-group"><label><i data-lucide="type"></i> Título</label><input type="text" id="moduleTitle"
+            placeholder="Ej: M12 - Monitoring"></div>
+        <div class="form-group">
+          <div class="checkbox-group"><input type="checkbox" id="moduleHidden"> Oculto para estudiantes</div>
+        </div>
+        <div class="modal-msg error" id="moduleError"></div>
+      </div>
+      <div class="modal-footer"><button class="btn-modal secondary"
+          onclick="closeModal('moduleModal')">Cancelar</button><button class="btn-modal green" onclick="saveModule()"><i
+            data-lucide="check"></i> Guardar</button></div>
+    </div>
+  </div>
+
+  <!-- Delete Module Modal -->
+  <div class="modal-overlay" id="deleteModuleModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-header-icon red"><i data-lucide="trash-2"></i></div>
+        <h3>Eliminar módulo</h3>
+      </div>
+      <div class="modal-body">
+        <p>Se eliminará <strong id="deleteModuleName"></strong> y todos sus episodios.</p><input type="hidden"
+          id="deleteModuleId">
+      </div>
+      <div class="modal-footer"><button class="btn-modal secondary"
+          onclick="closeModal('deleteModuleModal')">Cancelar</button><button class="btn-modal danger"
+          onclick="confirmDeleteModule()"><i data-lucide="trash-2"></i> Eliminar</button></div>
+    </div>
+  </div>
+
+  <!-- Episode Modal -->
+  <div class="modal-overlay" id="episodeModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-header-icon blue"><i data-lucide="play-circle"></i></div>
+        <h3 id="episodeModalTitle">Nuevo episodio</h3>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="episodeEditId"><input type="hidden" id="episodeModuleId">
+        <div class="form-group"><label><i data-lucide="type"></i> Título</label><input type="text" id="episodeTitle"
+            placeholder="Ej: Introducción a Docker"></div>
+        <div class="form-group"><label><i data-lucide="link"></i> URL del video</label><input type="text"
+            id="episodeVideoUrl" placeholder="https://youtube.com/..."></div>
+        <div class="form-group">
+          <div class="checkbox-group"><input type="checkbox" id="episodeHidden"> Oculto para estudiantes</div>
+        </div>
+        <div class="modal-msg error" id="episodeError"></div>
+      </div>
+      <div class="modal-footer"><button class="btn-modal secondary"
+          onclick="closeModal('episodeModal')">Cancelar</button><button class="btn-modal green"
+          onclick="saveEpisode()"><i data-lucide="check"></i> Guardar</button></div>
+    </div>
+  </div>
+
+  <!-- Delete Episode Modal -->
+  <div class="modal-overlay" id="deleteEpisodeModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-header-icon red"><i data-lucide="trash-2"></i></div>
+        <h3>Eliminar episodio</h3>
+      </div>
+      <div class="modal-body">
+        <p>Se eliminará <strong id="deleteEpisodeName"></strong>.</p><input type="hidden" id="deleteEpisodeId">
+      </div>
+      <div class="modal-footer"><button class="btn-modal secondary"
+          onclick="closeModal('deleteEpisodeModal')">Cancelar</button><button class="btn-modal danger"
+          onclick="confirmDeleteEpisode()"><i data-lucide="trash-2"></i> Eliminar</button></div>
+    </div>
+  </div>
+
+  <!-- User Detail Modal -->
+  <div class="modal-overlay" id="userModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-header-icon purple"><i data-lucide="user"></i></div>
+        <h3 id="userModalTitle">Detalle</h3>
+      </div>
+      <div class="modal-body" id="userModalBody"></div>
+      <div class="modal-footer"><button class="btn-modal secondary" onclick="closeModal('userModal')">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- System Modal -->
+  <div class="modal-overlay" id="systemModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-header-icon blue"><i data-lucide="server"></i></div>
+        <h3>Estado del Sistema</h3>
+      </div>
+      <div class="modal-body">
+        <div class="detail-row"><span class="detail-label"><i data-lucide="activity"></i> Estado</span><span
+            class="detail-value" style="color:#3fb950">Operativo</span></div>
+        <div class="detail-row"><span class="detail-label"><i data-lucide="database"></i> Base de datos</span><span
+            class="detail-value" style="color:#3fb950">Conectada</span></div>
+        <div class="detail-row"><span class="detail-label"><i data-lucide="git-branch"></i> Versión</span><span
+            class="detail-value">1.0.0</span></div>
+      </div>
+      <div class="modal-footer"><button class="btn-modal primary" onclick="closeModal('systemModal')">Entendido</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    lucide.createIcons();
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
+    if (!token || role !== 'admin') window.location.href = '/';
+    try { const p = JSON.parse(atob(token.split('.')[1])); document.getElementById('sidebarUser').textContent = p.username || 'Admin'; } catch { }
+
+    function scrollTo(id) { document.getElementById(id).scrollIntoView({ behavior: 'smooth' }); }
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    document.querySelectorAll('.modal-overlay').forEach(el => { el.addEventListener('click', e => { if (e.target === el) el.classList.remove('active'); }); });
+    function toggleAccordion(el) { el.closest('.accordion-item').classList.toggle('open'); }
+
+    async function apiFetch(url, opts = {}) {
+      opts.headers = { ...opts.headers, 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
+      const res = await fetch(url, opts);
+      if (res.status === 401 || res.status === 403) { logout(); return null; }
+      return res.json();
+    }
+
+    // Module CRUD
+    function openCreateModuleModal() { document.getElementById('moduleModalTitle').textContent = 'Nuevo módulo'; document.getElementById('moduleEditId').value = ''; document.getElementById('moduleTitle').value = ''; document.getElementById('moduleHidden').checked = false; document.getElementById('moduleError').style.display = 'none'; openModal('moduleModal'); }
+    function openEditModuleModal(m) { document.getElementById('moduleModalTitle').textContent = 'Editar módulo'; document.getElementById('moduleEditId').value = m.id; document.getElementById('moduleTitle').value = m.title; document.getElementById('moduleHidden').checked = m.is_hidden; document.getElementById('moduleError').style.display = 'none'; openModal('moduleModal'); }
+    async function saveModule() {
+      const title = document.getElementById('moduleTitle').value.trim(), isHidden = document.getElementById('moduleHidden').checked, editId = document.getElementById('moduleEditId').value, errEl = document.getElementById('moduleError');
+      if (!title) { errEl.textContent = 'Título requerido'; errEl.style.display = 'block'; return; } errEl.style.display = 'none';
+      const data = editId ? await apiFetch(`/api/modules/update?id=${editId}`, { method: 'PUT', body: JSON.stringify({ title, is_hidden: isHidden }) }) : await apiFetch('/api/modules/create', { method: 'POST', body: JSON.stringify({ title, is_hidden: isHidden }) });
+      if (data?.success) { closeModal('moduleModal'); await reload(); } else { errEl.textContent = data?.message || 'Error'; errEl.style.display = 'block'; }
+    }
+    function openDeleteModuleModal(m) { document.getElementById('deleteModuleId').value = m.id; document.getElementById('deleteModuleName').textContent = m.title; openModal('deleteModuleModal'); }
+    async function confirmDeleteModule() { const data = await apiFetch(`/api/modules/delete?id=${document.getElementById('deleteModuleId').value}`, { method: 'DELETE' }); if (data?.success) { closeModal('deleteModuleModal'); await reload(); } }
+
+    // Episode CRUD
+    function openCreateEpisodeModal(mid) { document.getElementById('episodeModalTitle').textContent = 'Nuevo episodio'; document.getElementById('episodeEditId').value = ''; document.getElementById('episodeModuleId').value = mid; document.getElementById('episodeTitle').value = ''; document.getElementById('episodeVideoUrl').value = ''; document.getElementById('episodeHidden').checked = false; document.getElementById('episodeError').style.display = 'none'; openModal('episodeModal'); }
+    function openEditEpisodeModal(ep) { document.getElementById('episodeModalTitle').textContent = 'Editar episodio'; document.getElementById('episodeEditId').value = ep.id; document.getElementById('episodeModuleId').value = ep.module_id; document.getElementById('episodeTitle').value = ep.title; document.getElementById('episodeVideoUrl').value = ep.video_url; document.getElementById('episodeHidden').checked = ep.is_hidden; document.getElementById('episodeError').style.display = 'none'; openModal('episodeModal'); }
+    async function saveEpisode() {
+      const title = document.getElementById('episodeTitle').value.trim(), videoUrl = document.getElementById('episodeVideoUrl').value.trim(), isHidden = document.getElementById('episodeHidden').checked, moduleId = parseInt(document.getElementById('episodeModuleId').value), editId = document.getElementById('episodeEditId').value, errEl = document.getElementById('episodeError');
+      if (!title) { errEl.textContent = 'Título requerido'; errEl.style.display = 'block'; return; } errEl.style.display = 'none';
+      const data = editId ? await apiFetch(`/api/episodes/update?id=${editId}`, { method: 'PUT', body: JSON.stringify({ title, video_url: videoUrl, is_hidden: isHidden, module_id: moduleId }) }) : await apiFetch('/api/episodes/create', { method: 'POST', body: JSON.stringify({ title, video_url: videoUrl, is_hidden: isHidden, module_id: moduleId }) });
+      if (data?.success) { closeModal('episodeModal'); await reload(); } else { errEl.textContent = data?.message || 'Error'; errEl.style.display = 'block'; }
+    }
+    function openDeleteEpisodeModal(ep) { document.getElementById('deleteEpisodeId').value = ep.id; document.getElementById('deleteEpisodeName').textContent = ep.title; openModal('deleteEpisodeModal'); }
+    async function confirmDeleteEpisode() { const data = await apiFetch(`/api/episodes/delete?id=${document.getElementById('deleteEpisodeId').value}`, { method: 'DELETE' }); if (data?.success) { closeModal('deleteEpisodeModal'); await reload(); } }
+
+    // User Management
+    async function toggleBlockUser(id, blocked) { await apiFetch(`/api/users/block?id=${id}&blocked=${blocked}`, { method: 'PUT' }); await reload(); }
+    async function changeUserRole(id, newRole) { await apiFetch(`/api/users/role?id=${id}`, { method: 'PUT', body: JSON.stringify({ role: newRole }) }); await reload(); }
+
+    function showUserDetail(u) {
+      document.getElementById('userModalTitle').textContent = u.username;
+      document.getElementById('userModalBody').innerHTML = `
+        <div class="detail-row"><span class="detail-label"><i data-lucide="hash"></i> ID</span><span class="detail-value">${u.id}</span></div>
+        <div class="detail-row"><span class="detail-label"><i data-lucide="user"></i> Usuario</span><span class="detail-value">${u.username}</span></div>
+        <div class="detail-row"><span class="detail-label"><i data-lucide="shield"></i> Rol</span><span class="detail-value">${u.role}</span></div>
+        <div class="detail-row"><span class="detail-label"><i data-lucide="${u.is_blocked ? 'lock' : 'unlock'}"></i> Estado</span><span class="detail-value" style="color:${u.is_blocked ? '#f85149' : '#3fb950'}">${u.is_blocked ? 'Bloqueado' : 'Activo'}</span></div>
+        <div class="detail-row"><span class="detail-label"><i data-lucide="calendar"></i> Registrado</span><span class="detail-value">${new Date(u.created_at).toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })}</span></div>`;
+      lucide.createIcons(); openModal('userModal');
+    }
+
+    // Load Data
+    async function loadUsers() {
+      const data = await apiFetch('/api/users');
+      const tbody = document.getElementById('usersTable');
+      if (!data?.data) { tbody.innerHTML = '<tr><td colspan="6" class="empty-msg">Sin datos</td></tr>'; return; }
+      document.getElementById('statUsers').textContent = data.data.length;
+      tbody.innerHTML = data.data.map(u => {
+        const uJSON = JSON.stringify(u).replace(/'/g, '&#39;');
+        return `<tr>
+          <td>${u.id}</td>
+          <td style="font-weight:500">${u.username}</td>
+          <td><span class="role-badge ${u.role}"><i data-lucide="${u.role === 'admin' ? 'shield' : 'graduation-cap'}"></i> ${u.role}</span></td>
+          <td><span class="status-badge ${u.is_blocked ? 'blocked' : 'active'}"><i data-lucide="${u.is_blocked ? 'lock' : 'check-circle-2'}"></i> ${u.is_blocked ? 'Bloqueado' : 'Activo'}</span></td>
+          <td>${new Date(u.created_at).toLocaleDateString('es-MX')}</td>
+          <td>
+            <button class="btn-action" onclick='showUserDetail(${uJSON})'><i data-lucide="eye"></i></button>
+            <button class="btn-action ${u.is_blocked ? 'success' : 'danger'}" onclick="toggleBlockUser(${u.id},${!u.is_blocked})"><i data-lucide="${u.is_blocked ? 'unlock' : 'lock'}"></i></button>
+            <button class="btn-action" onclick="changeUserRole(${u.id},'${u.role === 'admin' ? 'student' : 'admin'}')"><i data-lucide="${u.role === 'admin' ? 'user' : 'shield'}"></i> ${u.role === 'admin' ? 'Quitar admin' : 'Hacer admin'}</button>
+          </td></tr>`;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    async function loadModulesAndEpisodes() {
+      const [modData, epData] = await Promise.all([apiFetch('/api/modules'), apiFetch('/api/episodes')]);
+      const container = document.getElementById('modulesAccordion');
+      if (!modData?.data) { container.innerHTML = '<p class="empty-msg">Sin datos</p>'; return; }
+      const allModules = modData.data, allEpisodes = epData?.data || [];
+      document.getElementById('statModules').textContent = allModules.length;
+      document.getElementById('statEpisodes').textContent = allEpisodes.length;
+      document.getElementById('statHidden').textContent = allModules.filter(m => m.is_hidden).length;
+      container.innerHTML = allModules.map((m, i) => {
+        const eps = allEpisodes.filter(e => e.module_id === m.id);
+        const mJ = JSON.stringify(m).replace(/'/g, '&#39;');
+        return `<div class="accordion-item">
+          <button class="accordion-header" onclick="toggleAccordion(this)">
+            <div class="accordion-num">${i + 1}</div><span class="accordion-title">${m.title}</span>
+            <div class="accordion-meta"><span class="status-badge ${m.is_hidden ? 'hidden' : 'visible'}"><i data-lucide="${m.is_hidden ? 'eye-off' : 'eye'}"></i> ${m.is_hidden ? 'Oculto' : 'Visible'}</span></div>
+            <svg class="accordion-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="accordion-body"><div class="accordion-content">
+            <div class="accordion-actions">
+              <button class="btn-action" onclick='openEditModuleModal(${mJ})'><i data-lucide="pencil"></i> Editar</button>
+              <button class="btn-action danger" onclick='openDeleteModuleModal(${mJ})'><i data-lucide="trash-2"></i> Eliminar</button>
+              <button class="btn-add" onclick="openCreateEpisodeModal(${m.id})" style="margin-left:auto;font-size:0.7rem;padding:0.3rem 0.6rem"><i data-lucide="plus"></i> Episodio</button>
+            </div>
+            ${eps.length === 0 ? '<p class="no-episodes">Sin episodios</p>' : eps.map(ep => { const eJ = JSON.stringify(ep).replace(/'/g, '&#39;'); return `<div class="episode-row"><i data-lucide="play-circle"></i><span class="ep-title">${ep.title}</span>${ep.video_url ? `<a href="${ep.video_url}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:0.3rem;padding:0.2rem 0.5rem;background:#12253a;border:1px solid #1f6feb;border-radius:5px;color:#58a6ff;font-size:0.65rem;font-weight:600;text-decoration:none;flex-shrink:0"><i data-lucide="external-link" style="width:11px;height:11px"></i> Ver</a>` : ''}<span class="status-badge ${ep.is_hidden ? 'hidden' : 'visible'}" style="font-size:0.65rem"><i data-lucide="${ep.is_hidden ? 'eye-off' : 'eye'}"></i> ${ep.is_hidden ? 'Oculto' : 'Visible'}</span><div class="ep-actions"><button class="btn-action" onclick='openEditEpisodeModal(${eJ})' style="font-size:0.65rem;padding:0.2rem 0.4rem"><i data-lucide="pencil"></i></button><button class="btn-action danger" onclick='openDeleteEpisodeModal(${eJ})' style="font-size:0.65rem;padding:0.2rem 0.4rem"><i data-lucide="trash-2"></i></button></div></div>`; }).join('')}
+          </div></div></div>`;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    async function reload() { await Promise.all([loadUsers(), loadModulesAndEpisodes()]); }
+    function logout() { localStorage.clear(); window.location.href = '/'; }
+    reload();
+  </script>
+</body>
+
+</html>

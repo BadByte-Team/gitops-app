@@ -1,0 +1,58 @@
+-- Script de inicialización local (pruebas con docker-compose)
+-- Para Kubernetes, este archivo está en mysql-configmap.yaml
+
+CREATE DATABASE IF NOT EXISTS curso_db;
+USE curso_db;
+
+CREATE TABLE IF NOT EXISTS users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(50) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  role ENUM('admin', 'student') NOT NULL DEFAULT 'student',
+  is_blocked BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS modules (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  is_hidden BOOLEAN DEFAULT FALSE
+);
+
+CREATE TABLE IF NOT EXISTS episodes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  module_id INT,
+  title VARCHAR(255) NOT NULL,
+  video_url VARCHAR(500) NOT NULL DEFAULT '',
+  is_hidden BOOLEAN DEFAULT FALSE,
+  FOREIGN KEY (module_id) REFERENCES modules(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS user_progress (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  episode_id INT NOT NULL,
+  completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY unique_progress (user_id, episode_id),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (episode_id) REFERENCES episodes(id) ON DELETE CASCADE
+);
+
+-- Usuario admin de prueba
+-- Contraseña: admin123 (bcrypt hash)
+INSERT IGNORE INTO users (username, password, role) VALUES
+('admin', '$2b$10$3xA5umDrIFNWXD4j472c2uv9S.9nKnnrE1zDBhJHWMjYwQIUm8SIm', 'admin');
+
+-- Módulos de ejemplo
+INSERT IGNORE INTO modules (id, title, is_hidden) VALUES
+(1, 'M01 - Introducción y VS Code', FALSE),
+(2, 'M02 - Git y GitHub', FALSE),
+(3, 'M03 - Docker', FALSE),
+(4, 'M04 - AWS, IAM y CLI', FALSE),
+(5, 'M05 - Terraform', FALSE),
+(6, 'M06 - Kubernetes', FALSE),
+(7, 'M07 - K3s', FALSE),
+(8, 'M08 - Jenkins CI', FALSE),
+(9, 'M09 - ArgoCD y GitOps', FALSE),
+(10, 'M10 - Seguridad (Trivy + SonarQube)', TRUE),
+(11, 'M11 - Proyecto Final', TRUE);

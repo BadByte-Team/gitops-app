@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Curso GitOps — Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0b0f19;
+      color: #c9d1d9;
+      min-height: 100vh;
+      display: flex;
+    }
+
+    .sidebar {
+      width: 250px;
+      background: #0d1117;
+      border-right: 1px solid #21262d;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 10;
+    }
+
+    .sidebar-brand {
+      padding: 1.25rem 1rem;
+      border-bottom: 1px solid #21262d;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      background: #1f6feb;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-icon svg {
+      color: #fff;
+      width: 18px;
+      height: 18px;
+    }
+
+    .brand-text h2 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #e6edf3;
+    }
+
+    .brand-text span {
+      font-size: 0.65rem;
+      color: #484f58;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 0.75rem 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.6rem 0.85rem;
+      border-radius: 8px;
+      color: #7d8590;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+
+    .nav-item.active {
+      background: #1c2128;
+      color: #e6edf3;
+    }
+
+    .nav-item svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .sidebar-footer {
+      padding: 0.75rem;
+      border-top: 1px solid #21262d;
+    }
+
+    .user-card {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.65rem;
+      border-radius: 8px;
+      background: #161b22;
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      background: #238636;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .user-avatar svg {
+      color: #fff;
+      width: 16px;
+      height: 16px;
+    }
+
+    .user-info strong {
+      display: block;
+      font-size: 0.78rem;
+      color: #e6edf3;
+    }
+
+    .user-info span {
+      font-size: 0.65rem;
+      color: #484f58;
+    }
+
+    .main {
+      margin-left: 250px;
+      flex: 1;
+      padding: 1.75rem 2rem;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.75rem;
+    }
+
+    .topbar h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #e6edf3;
+    }
+
+    .btn-logout {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.45rem 0.85rem;
+      background: #1c1214;
+      border: 1px solid #3d1518;
+      border-radius: 6px;
+      color: #f85149;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .btn-logout svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .stat-card {
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-radius: 10px;
+      padding: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .stat-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .stat-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .stat-icon.blue {
+      background: #12253a;
+      color: #58a6ff;
+    }
+
+    .stat-icon.green {
+      background: #12261e;
+      color: #3fb950;
+    }
+
+    .stat-icon.purple {
+      background: #1c1631;
+      color: #bc8cff;
+    }
+
+    .stat-icon.amber {
+      background: #2a1f0e;
+      color: #d29922;
+    }
+
+    .stat-text span {
+      font-size: 0.7rem;
+      color: #484f58;
+    }
+
+    .stat-text strong {
+      display: block;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #e6edf3;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      margin-bottom: 0.85rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #e6edf3;
+    }
+
+    .section-header svg {
+      width: 18px;
+      height: 18px;
+      color: #58a6ff;
+    }
+
+    /* Progress bar */
+    .progress-bar-wrap {
+      width: 100%;
+      height: 6px;
+      background: #21262d;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 0.35rem;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: #238636;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+
+    .overall-progress {
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-radius: 10px;
+      padding: 1.15rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .overall-progress-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+
+    .overall-progress-header span {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #e6edf3;
+    }
+
+    .overall-progress-header .pct {
+      color: #3fb950;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .overall-progress .progress-bar-wrap {
+      height: 8px;
+    }
+
+    .accordion {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .accordion-item {
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .accordion-header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      padding: 0.85rem 1rem;
+      background: none;
+      border: none;
+      color: #c9d1d9;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .accordion-num {
+      width: 30px;
+      height: 30px;
+      background: #1f6feb;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .accordion-title {
+      flex: 1;
+    }
+
+    .accordion-pct {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #3fb950;
+      margin-right: 0.25rem;
+    }
+
+    .accordion-chevron {
+      width: 16px;
+      height: 16px;
+      color: #484f58;
+      transition: transform 0.2s;
+    }
+
+    .accordion-item.open .accordion-chevron {
+      transform: rotate(180deg);
+    }
+
+    .accordion-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+
+    .accordion-item.open .accordion-body {
+      max-height: 1000px;
+    }
+
+    .accordion-content {
+      padding: 0 1rem 0.85rem 1rem;
+      border-top: 1px solid #21262d;
+      padding-top: 0.85rem;
+    }
+
+    .module-progress {
+      margin-bottom: 0.65rem;
+    }
+
+    .module-progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: #484f58;
+      margin-bottom: 0.2rem;
+    }
+
+    .episode-item {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.5rem 0;
+      font-size: 0.8rem;
+      color: #7d8590;
+      border-bottom: 1px solid #1c2128;
+      cursor: pointer;
+    }
+
+    .episode-item:last-child {
+      border-bottom: none;
+    }
+
+    .episode-item svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    .episode-item .ep-title {
+      flex: 1;
+    }
+
+    .episode-item.completed {
+      color: #3fb950;
+    }
+
+    .episode-item.completed svg {
+      color: #3fb950;
+    }
+
+    .episode-check {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      border: 2px solid #30363d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .episode-check.done {
+      background: #238636;
+      border-color: #238636;
+    }
+
+    .episode-check.done svg {
+      color: #fff;
+      width: 12px;
+      height: 12px;
+    }
+
+    .no-episodes {
+      color: #484f58;
+      font-size: 0.78rem;
+      padding: 0.35rem 0;
+    }
+
+    .empty-msg {
+      text-align: center;
+      color: #484f58;
+      font-size: 0.82rem;
+      padding: 1.5rem;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.65);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 1.75rem;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      margin-bottom: 1rem;
+    }
+
+    .modal-header-icon {
+      width: 36px;
+      height: 36px;
+      background: #12253a;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-header-icon svg {
+      width: 18px;
+      height: 18px;
+      color: #58a6ff;
+    }
+
+    .modal-header h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #e6edf3;
+    }
+
+    .modal-body {
+      color: #7d8590;
+      font-size: 0.82rem;
+      line-height: 1.6;
+    }
+
+    .modal-body p {
+      margin-bottom: 0.65rem;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.55rem 0;
+      border-bottom: 1px solid #21262d;
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-label {
+      color: #484f58;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .detail-label svg {
+      width: 13px;
+      height: 13px;
+    }
+
+    .detail-value {
+      color: #e6edf3;
+      font-weight: 500;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 1.25rem;
+    }
+
+    .btn-modal {
+      padding: 0.5rem 1.1rem;
+      border-radius: 6px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: #1f6feb;
+      color: #fff;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+
+      .main {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon"><i data-lucide="rocket"></i></div>
+      <div class="brand-text">
+        <h2>Curso GitOps</h2><span>Plataforma de aprendizaje</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item active"><i data-lucide="layout-dashboard"></i> Dashboard</button>
+      <button class="nav-item"
+        onclick="document.getElementById('modulesSection').scrollIntoView({behavior:'smooth'})"><i
+          data-lucide="layers"></i> Módulos</button>
+      <button class="nav-item" onclick="openModal('progressModal')"><i data-lucide="bar-chart-3"></i> Mi
+        progreso</button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar"><i data-lucide="graduation-cap"></i></div>
+        <div class="user-info"><strong id="sidebarUser">Estudiante</strong><span>student</span></div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <h1>Dashboard</h1>
+      <button class="btn-logout" onclick="logout()"><i data-lucide="log-out"></i> Cerrar sesión</button>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon blue"><i data-lucide="layers"></i></div>
+        <div class="stat-text"><span>Módulos</span><strong id="statModules">—</strong></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon amber"><i data-lucide="play-circle"></i></div>
+        <div class="stat-text"><span>Episodios</span><strong id="statEpisodes">—</strong></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green"><i data-lucide="check-circle-2"></i></div>
+        <div class="stat-text"><span>Completados</span><strong id="statCompleted">0</strong></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon purple"><i data-lucide="trophy"></i></div>
+        <div class="stat-text"><span>Progreso</span><strong id="statPercent">0%</strong></div>
+      </div>
+    </div>
+
+    <div class="overall-progress">
+      <div class="overall-progress-header"><span>Progreso general</span><span class="pct" id="overallPct">0%</span>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="overallBar" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div id="modulesSection">
+      <div class="section-header"><i data-lucide="book-open"></i> Módulos del curso</div>
+      <div class="accordion" id="modulesAccordion">
+        <p class="empty-msg">Cargando módulos...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress Modal -->
+  <div class="modal-overlay" id="progressModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-header-icon"><i data-lucide="bar-chart-3"></i></div>
+        <h3>Mi Progreso</h3>
+      </div>
+      <div class="modal-body" id="progressModalBody">
+        <div class="detail-row"><span class="detail-label"><i data-lucide="play-circle"></i> Episodios
+            totales</span><span class="detail-value" id="prgTotal">—</span></div>
+        <div class="detail-row"><span class="detail-label"><i data-lucide="check-circle-2"></i> Completados</span><span
+            class="detail-value" id="prgDone">—</span></div>
+        <div class="detail-row"><span class="detail-label"><i data-lucide="circle"></i> Pendientes</span><span
+            class="detail-value" id="prgPending">—</span></div>
+        <div class="detail-row"><span class="detail-label"><i data-lucide="trophy"></i> Progreso</span><span
+            class="detail-value" style="color:#3fb950" id="prgPct">—</span></div>
+      </div>
+      <div class="modal-footer"><button class="btn-modal" onclick="closeModal('progressModal')">Cerrar</button></div>
+    </div>
+  </div>
+
+  <script>
+    lucide.createIcons();
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = '/';
+    let userId = 0;
+    try { const p = JSON.parse(atob(token.split('.')[1])); document.getElementById('sidebarUser').textContent = p.username || 'Estudiante'; userId = p.user_id; } catch { }
+
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    document.querySelectorAll('.modal-overlay').forEach(el => { el.addEventListener('click', e => { if (e.target === el) el.classList.remove('active'); }); });
+    function toggleAccordion(el) { el.closest('.accordion-item').classList.toggle('open'); }
+
+    async function apiFetch(url, opts = {}) {
+      opts.headers = { ...opts.headers, 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
+      const res = await fetch(url, opts);
+      if (res.status === 401 || res.status === 403) { logout(); return null; }
+      return res.json();
+    }
+
+    let completedEpisodes = new Set();
+
+    async function toggleEpisode(episodeId) {
+      const data = await apiFetch('/api/progress/toggle', { method: 'POST', body: JSON.stringify({ episode_id: episodeId }) });
+      if (data?.success) {
+        if (data.data.completed) completedEpisodes.add(episodeId);
+        else completedEpisodes.delete(episodeId);
+        renderUI();
+      }
+    }
+
+    let allModules = [], allEpisodes = [];
+
+    async function loadData() {
+      const [modData, epData, progressData] = await Promise.all([
+        apiFetch('/api/modules'),
+        apiFetch('/api/episodes'),
+        apiFetch('/api/progress')
+      ]);
+      allModules = modData?.data || [];
+      allEpisodes = epData?.data || [];
+      completedEpisodes = new Set(progressData?.data || []);
+      renderUI();
+    }
+
+    function renderUI() {
+      const totalEp = allEpisodes.length;
+      const doneCount = completedEpisodes.size;
+      const pct = totalEp > 0 ? Math.round(doneCount / totalEp * 100) : 0;
+
+      document.getElementById('statModules').textContent = allModules.length;
+      document.getElementById('statEpisodes').textContent = totalEp;
+      document.getElementById('statCompleted').textContent = doneCount;
+      document.getElementById('statPercent').textContent = pct + '%';
+      document.getElementById('overallPct').textContent = pct + '%';
+      document.getElementById('overallBar').style.width = pct + '%';
+      document.getElementById('prgTotal').textContent = totalEp;
+      document.getElementById('prgDone').textContent = doneCount;
+      document.getElementById('prgPending').textContent = totalEp - doneCount;
+      document.getElementById('prgPct').textContent = pct + '%';
+
+      const container = document.getElementById('modulesAccordion');
+      if (!allModules.length) { container.innerHTML = '<p class="empty-msg">No hay módulos disponibles.</p>'; return; }
+
+      container.innerHTML = allModules.map((m, i) => {
+        const eps = allEpisodes.filter(e => e.module_id === m.id);
+        const modDone = eps.filter(e => completedEpisodes.has(e.id)).length;
+        const modPct = eps.length > 0 ? Math.round(modDone / eps.length * 100) : 0;
+        return `<div class="accordion-item">
+          <button class="accordion-header" onclick="toggleAccordion(this)">
+            <div class="accordion-num">${i + 1}</div>
+            <span class="accordion-title">${m.title}</span>
+            <span class="accordion-pct">${modPct}%</span>
+            <svg class="accordion-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="accordion-body"><div class="accordion-content">
+            <div class="module-progress">
+              <div class="module-progress-label"><span>${modDone} de ${eps.length} completados</span><span>${modPct}%</span></div>
+              <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${modPct}%"></div></div>
+            </div>
+            ${eps.length === 0 ? '<p class="no-episodes">Sin episodios</p>' :
+            eps.map(ep => {
+              const done = completedEpisodes.has(ep.id);
+              return `<div class="episode-item ${done ? 'completed' : ''}" onclick="toggleEpisode(${ep.id})">
+                  <div class="episode-check ${done ? 'done' : ''}">${done ? '<i data-lucide="check"></i>' : ''}</div>
+                  <i data-lucide="play-circle"></i>
+                  <span class="ep-title">${ep.title}</span>
+                  ${ep.video_url ? `<a href="${ep.video_url}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:0.3rem;padding:0.25rem 0.6rem;background:#12253a;border:1px solid #1f6feb;border-radius:5px;color:#58a6ff;font-size:0.7rem;font-weight:600;text-decoration:none;margin-left:auto;flex-shrink:0"><i data-lucide="external-link" style="width:12px;height:12px"></i> Ver video</a>` : ''}
+                </div>`;
+            }).join('')}
+          </div></div></div>`;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function logout() { localStorage.clear(); window.location.href = '/'; }
+    loadData();
+  </script>
+</body>
+
+</html>
