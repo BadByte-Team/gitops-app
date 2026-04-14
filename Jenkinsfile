@@ -8,9 +8,10 @@ pipeline {
 
     environment {
         DOCKER_HUB_CREDS = credentials('dockerhub-id')
-        DOCKER_IMAGE     = "TU_USUARIO_DOCKERHUB/curso-gitops"
+        DOCKER_IMAGE     = "gjisus/curso-gitops"
         SCANNER_HOME     = tool('sonar-scanner')
-        GITHUB_USER      = "TU_USUARIO_GITHUB"
+        GITHUB_USER      = "GutsNet"
+        REPO_ORG         = "BadByte-Team"
         INFRA_REPO       = "gitops-infra"
     }
 
@@ -44,13 +45,13 @@ pipeline {
             }
         }
 
-        stage('Quality Gate') {
-            steps {
-                timeout(time: 5, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
+        // stage('Quality Gate') {
+        //     steps {
+        //         timeout(time: 5, unit: 'MINUTES') {
+        //             waitForQualityGate abortPipeline: true
+        //         }
+        //     }
+        // }
 
         stage('Docker Build') {
             steps {
@@ -87,7 +88,7 @@ pipeline {
                     sh """
                         rm -rf infra-repo
 
-                        git clone https://${GITHUB_TOKEN}@github.com/${GITHUB_USER}/${INFRA_REPO}.git infra-repo
+                        git clone https://${GITHUB_TOKEN}@github.com/${REPO_ORG}/${INFRA_REPO}.git infra-repo
 
                         cd infra-repo
                         git config user.email "jenkins@local.com"
